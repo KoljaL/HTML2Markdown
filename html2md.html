@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1, initial-scale=1.0">
+    <title>HTML &#10095; MD</title>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <style>
+        .wrapper {
+            display: flex;
+            background: #1b1d23;
+            color: #abb2bf;
+            width: 100%;
+            font-size: 1.1em;
+            line-height: 1.6em;
+            margin: auto;
+        }
+        
+        .wrapper>div {
+            width: 50%;
+            margin: .5em;
+        }
+        
+        .header {
+            position: absolute;
+            display: flex;
+            width: 48%;
+            justify-content: right;
+        }
+        
+        .toggle {
+            margin-left: 5em;
+            margin-top: 1em;
+            cursor: pointer;
+            color: darkorange;
+        }
+        
+        .MDcontainer h2 {
+            color: steelblue;
+            line-height: 1em;
+            margin-top: .5em;
+            margin-left: .5em;
+        }
+        
+        .HTMLcontainer h2 {
+            color: darkred;
+            line-height: 1em;
+            margin-top: .5em;
+            margin-left: .5em;
+        }
+        
+        .renderedContainer h2 {
+            color: darkolivegreen;
+            line-height: 1em;
+            margin-top: .5em;
+            margin-left: .5em;
+        }
+        
+        textarea,
+        .rendered {
+            width: 100%;
+            height: 90vh;
+            background: #1b1d23;
+            color: #adbac7;
+            font-size: 14px;
+            line-height: 1.5em;
+            padding: .5em;
+            overflow-y: scroll;
+            border: 1px solid #444c56;
+            border-radius: 6px;
+        }
+        
+        textarea::-webkit-scrollbar,
+        .wrapper>div::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .wrapper>div,
+        textarea {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .renderedContainer {
+            display: none;
+        }
+        
+        .rendered {
+            padding: .5em;
+            border: 1px solid #444c56;
+            border-radius: 6px;
+        }
+        
+        * {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            line-height: 1.75em;
+            font-size: 16px;
+            background-color: #1b1d23;
+            color: #adbac7;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        
+        p {
+            font-size: 16px;
+        }
+        
+        h1 {
+            font-size: 30px;
+            line-height: 34px;
+        }
+        
+        h2 {
+            font-size: 20px;
+            line-height: 25px;
+        }
+        
+        h3 {
+            font-size: 16px;
+            line-height: 27px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #D8D8D8;
+            border-top: 1px solid #D8D8D8;
+        }
+        
+        hr {
+            height: 1px;
+            background-color: #d8d8d8;
+            border: none;
+            width: 100%;
+            margin: 0px;
+        }
+        
+        a[href] {
+            color: #1e8ad6;
+            text-decoration: none;
+        }
+        
+        a[href]:hover {
+            color: #3ba0e6;
+        }
+        
+        img {
+            max-width: 100%;
+        }
+        
+        li {
+            line-height: 1.5em;
+        }
+        
+        pre {
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            background-color: #2b333b;
+            border-radius: 6px;
+        }
+        
+        pre code {
+            display: inline;
+            max-width: auto;
+            padding: 0;
+            margin: 0;
+            overflow: visible;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <span class="toggle">show HTML preview</span>
+    </div>
+    <div class="wrapper">
+        <div class="MDcontainer">
+            <h2>Markdown</h2>
+            <textarea name="MD" id="MD"></textarea>
+        </div>
+        <div class="renderedContainer" style="display:none">
+            <h2>Preview</h2>
+            <div class="rendered"></div>
+        </div>
+        <div class="HTMLcontainer">
+            <h2>HTML</h2>
+            <textarea name="HTML" id="HTML"></textarea>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js"></script>
+
+
+<script>
+    let HTMLtextArea = document.getElementById('HTML');
+    let renderedContainer = document.querySelector('div.renderedContainer');
+    let rendered = document.querySelector('div.rendered');
+    let HTMLcontainer = document.querySelector('div.HTMLcontainer');
+    let MDtextArea = document.getElementById('MD');
+
+    // markdown to HTML converter
+    var converter = new showdown.Converter();
+    // HTML to markdown converter
+    var turndownService = new TurndownService({
+        headingStyle: 'atx',
+        bulletListMarker: '-',
+        codeBlockStyle: 'fenced',
+        preformattedCode: true,
+    })
+
+
+    //
+    // get formatted text & past in HTML textbox , render MD and past in MD textbox
+    document.addEventListener('paste', function(e) {
+        e.preventDefault();
+        let pastedText = e.clipboardData.getData('text/html');
+        HTMLtextArea.value = pastedText
+        pastedText = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+            return '&#' + i.charCodeAt(0) + ';';
+        });
+
+        MDtextArea.value = turndownService.turndown(pastedText)
+    });
+
+
+    //
+    // on new input in HTML textarea render MD textarea
+    HTMLtextArea.addEventListener("input", function(event) {
+        var markdown = turndownService.turndown(HTMLtextArea.value)
+        markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+            return '&#' + i.charCodeAt(0) + ';';
+        });
+        MDtextArea.value = markdown;
+    });
+
+
+    //
+    // on new input in MD textarea render previev div
+    MDtextArea.addEventListener("input", function(event) {
+        rendered.innerHTML = converter.makeHtml(MDtextArea.value);
+    });
+
+
+    //
+    // toggle HTML als rendered view
+    document.querySelector('.toggle').addEventListener("click", function(event) {
+        if (renderedContainer.style.display === "none") {
+            rendered.innerHTML = converter.makeHtml(MDtextArea.value);
+            renderedContainer.style.display = "block";
+            HTMLcontainer.style.display = "none";
+        } else {
+            renderedContainer.style.display = "none";
+            HTMLcontainer.style.display = "block";
+        }
+    });
+</script>
+
+</html>
