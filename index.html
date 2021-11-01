@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=1, initial-scale=1.0">
     <title>HTML &#10095; MD</title>
+    <link rel="icon" type="image/png" href="favicon.ico" sizes="any">
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <style>
         .wrapper {
@@ -51,13 +52,15 @@
             margin-left: .5em;
         }
         
-        .renderedContainer h2 {
+        .renderedContainer>h2 {
             color: darkolivegreen;
             line-height: 1em;
             margin-top: .5em;
             margin-left: .5em;
         }
+        
         #HTML,
+        #MD,
         textarea,
         .rendered {
             width: 100%;
@@ -88,7 +91,7 @@
         }
         
         .rendered {
-            padding: .5em;
+            padding: 0 1em 1em 1em;
             border: 1px solid #444c56;
             border-radius: 6px;
         }
@@ -112,16 +115,21 @@
             font-size: 16px;
         }
         
-        h1 {
+        .rendered h1 a,
+        .rendered h1 {
             font-size: 30px;
             line-height: 34px;
+            color: #adbac7!important;
         }
         
-        h2 {
+        .rendered h2 a,
+        .rendered h2 {
             font-size: 20px;
             line-height: 25px;
+            color: #adbac7!important;
         }
         
+        h3 a,
         h3 {
             font-size: 16px;
             line-height: 27px;
@@ -129,6 +137,7 @@
             padding-bottom: 15px;
             border-bottom: 1px solid #D8D8D8;
             border-top: 1px solid #D8D8D8;
+            color: #adbac7!important;
         }
         
         hr {
@@ -176,6 +185,32 @@
             background-color: transparent;
             border: 0;
         }
+        
+        .iblize pre,
+        .iblize-dark {
+            color: #a3b8c2;
+            background-color: #1b1d23;
+        }
+        
+        .iblize .iblize_linenumber {
+            padding: 10px;
+        }
+        
+        .iblize .iblize_linenumber {
+            border-right: 1px solid #444c56;
+        }
+        
+        .iblize .token.title.important {
+            color: #e05269;
+        }
+        
+        .iblize .token.list.punctuation {
+            color: #e0a752;
+        }
+        
+        .iblize .token.url {
+            color: #7ab87d;
+        }
     </style>
 </head>
 
@@ -187,7 +222,8 @@
     <div class="wrapper">
         <div class="MDcontainer">
             <h2>Markdown</h2>
-            <textarea name="MD" id="MD"></textarea>
+            <div id="MD"></div>
+            <!-- <textarea name="MD" id="MD"></textarea> -->
         </div>
         <div class="renderedContainer" style="display:none">
             <h2>Preview</h2>
@@ -215,9 +251,13 @@
 
 
 
-    const iblize = new Iblize("#HTML", {
-    language: "html",
-});
+    const iblizeHTML = new Iblize("#HTML", {
+        language: "html",
+    });
+
+    const iblizeMD = new Iblize("#MD", {
+        language: "markdown",
+    });
 
 
     // markdown to HTML converter
@@ -236,33 +276,38 @@
     document.addEventListener('paste', function(e) {
         e.preventDefault();
         let pastedText = e.clipboardData.getData('text/html');
-        iblize.setValue(pastedText);
+        iblizeHTML.setValue(pastedText);
         // HTMLtextArea.innerHTML = pastedText
-        pastedText = pastedText.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+        const valueHTML = iblizeHTML.getValue();
+        var markdown = turndownService.turndown(valueHTML)
+        markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
             return '&#' + i.charCodeAt(0) + ';';
         });
+        iblizeMD.setValue(markdown);
 
-        MDtextArea.value = turndownService.turndown(pastedText)
+        // MDtextArea.value = markdown;
     });
 
 
     //
     // on new input in HTML textarea render MD textarea
     HTMLtextArea.addEventListener("input", function(event) {
-        const value = iblize.getValue();
-        console.log(value)
-        var markdown = turndownService.turndown(value)
+        const valueHTML = iblizeHTML.getValue();
+        // console.log(valueHTML)
+        var markdown = turndownService.turndown(valueHTML)
         markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
             return '&#' + i.charCodeAt(0) + ';';
         });
         MDtextArea.value = markdown;
+        iblizeMD.setValue(markdown);
+
     });
 
 
     //
     // on new input in MD textarea render previev div
     MDtextArea.addEventListener("input", function(event) {
-        rendered.innerHTML = converter.makeHtml(MDtextArea.value);
+        rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
     });
 
 
@@ -270,7 +315,8 @@
     // toggle HTML als rendered view
     document.querySelector('.toggle').addEventListener("click", function(event) {
         if (renderedContainer.style.display === "none") {
-            rendered.innerHTML = converter.makeHtml(MDtextArea.value);
+            // rendered.innerHTML = converter.makeHtml(MDtextArea.value);        
+            rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
             renderedContainer.style.display = "block";
             HTMLcontainer.style.display = "none";
         } else {
