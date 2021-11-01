@@ -57,7 +57,7 @@
             margin-top: .5em;
             margin-left: .5em;
         }
-        
+        #HTML,
         textarea,
         .rendered {
             width: 100%;
@@ -195,11 +195,13 @@
         </div>
         <div class="HTMLcontainer">
             <h2>HTML</h2>
-            <textarea name="HTML" id="HTML"></textarea>
+            <div id="HTML"></div>
+            <!-- <textarea name="HTML" id="HTML"></textarea> -->
         </div>
 
     </div>
 </body>
+<script src="https://unpkg.com/iblize/dist/iblize.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js"></script>
 
@@ -210,6 +212,13 @@
     let rendered = document.querySelector('div.rendered');
     let HTMLcontainer = document.querySelector('div.HTMLcontainer');
     let MDtextArea = document.getElementById('MD');
+
+
+
+    const iblize = new Iblize("#HTML", {
+    language: "html",
+});
+
 
     // markdown to HTML converter
     var converter = new showdown.Converter();
@@ -227,8 +236,9 @@
     document.addEventListener('paste', function(e) {
         e.preventDefault();
         let pastedText = e.clipboardData.getData('text/html');
-        HTMLtextArea.value = pastedText
-        pastedText = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+        iblize.setValue(pastedText);
+        // HTMLtextArea.innerHTML = pastedText
+        pastedText = pastedText.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
             return '&#' + i.charCodeAt(0) + ';';
         });
 
@@ -239,7 +249,9 @@
     //
     // on new input in HTML textarea render MD textarea
     HTMLtextArea.addEventListener("input", function(event) {
-        var markdown = turndownService.turndown(HTMLtextArea.value)
+        const value = iblize.getValue();
+        console.log(value)
+        var markdown = turndownService.turndown(value)
         markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
             return '&#' + i.charCodeAt(0) + ';';
         });
