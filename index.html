@@ -28,7 +28,8 @@
             position: absolute;
             display: flex;
             width: 48%;
-            justify-content: right;
+            /* justify-content: right; */
+            left: 60%;
         }
         
         .toggle {
@@ -37,19 +38,26 @@
             cursor: pointer;
             color: darkorange;
         }
+
+        .beauty {
+            margin-left: 5em;
+            margin-top: 1em;
+            cursor: pointer;
+            color: darkcyan;
+        }
         
         .MDcontainer h2 {
             color: steelblue;
             line-height: 1em;
             margin-top: .5em;
-            margin-left: .5em;
+            margin-left: 1.5em;
         }
         
         .HTMLcontainer h2 {
             color: darkred;
             line-height: 1em;
             margin-top: .5em;
-            margin-left: .5em;
+            margin-left: 1.5em;
         }
         
         .renderedContainer>h2 {
@@ -61,7 +69,6 @@
         
         #HTML,
         #MD,
-        textarea,
         .rendered {
             width: 100%;
             height: 90vh;
@@ -216,14 +223,15 @@
 
 <body>
 
-    <div class="header">
-        <span class="toggle">show HTML preview</span>
-    </div>
     <div class="wrapper">
         <div class="MDcontainer">
             <h2>Markdown</h2>
             <div id="MD"></div>
             <!-- <textarea name="MD" id="MD"></textarea> -->
+        </div>
+        <div class="header">
+            <span class="toggle">show HTML preview</span>
+            <span class="beauty">format HTML</span>
         </div>
         <div class="renderedContainer" style="display:none">
             <h2>Preview</h2>
@@ -240,7 +248,7 @@
 <script src="https://unpkg.com/iblize/dist/iblize.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.js"></script>
 
 <script>
     let HTMLtextArea = document.getElementById('HTML');
@@ -248,13 +256,31 @@
     let rendered = document.querySelector('div.rendered');
     let HTMLcontainer = document.querySelector('div.HTMLcontainer');
     let MDtextArea = document.getElementById('MD');
+    const BeautifyOptions = {
+        "indent_size": "2",
+        "indent_char": " ",
+        "max_preserve_newlines": "-1",
+        "preserve_newlines": false,
+        "keep_array_indentation": false,
+        "break_chained_methods": false,
+        "indent_scripts": "normal",
+        "brace_style": "collapse",
+        "space_before_conditional": true,
+        "unescape_strings": false,
+        "jslint_happy": false,
+        "end_with_newline": false,
+        "wrap_line_length": "0",
+        "indent_inner_html": false,
+        "comma_first": false,
+        "e4x": false,
+        "indent_empty_lines": false
+    }
 
-
-
+    // codeArea (iblize) for HTML
     const iblizeHTML = new Iblize("#HTML", {
         language: "html",
     });
-
+    // codeArea (iblize) for Markdown
     const iblizeMD = new Iblize("#MD", {
         language: "markdown",
     });
@@ -267,7 +293,16 @@
         headingStyle: 'atx',
         bulletListMarker: '-',
         codeBlockStyle: 'fenced',
-        preformattedCode: true,
+        fence: '```',
+        preformattedCode: false,
+    })
+
+
+    // beautify HTML code
+    document.querySelector('.beauty').addEventListener("click", function(event) {
+        let valueHTML = iblizeHTML.getValue();
+        valueHTML = html_beautify(valueHTML, BeautifyOptions)
+        iblizeHTML.setValue(valueHTML);
     })
 
 
@@ -276,6 +311,9 @@
     document.addEventListener('paste', function(e) {
         e.preventDefault();
         let pastedText = e.clipboardData.getData('text/html');
+        // beautify HTML code
+        pastedText = html_beautify(pastedText, BeautifyOptions)
+
         iblizeHTML.setValue(pastedText);
         // HTMLtextArea.innerHTML = pastedText
         const valueHTML = iblizeHTML.getValue();
@@ -286,6 +324,7 @@
         iblizeMD.setValue(markdown);
 
         // MDtextArea.value = markdown;
+
     });
 
 
