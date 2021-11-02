@@ -1,423 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=1, initial-scale=1.0" />
     <title>HTML &#10095; MD</title>
     <link rel="icon" type="image/png" href="favicon.ico" sizes="any" />
-    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <link href="http://fonts.cdnfonts.com/css/segoe-ui-4" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@typopro/web-zilla-slab@3.7.5/TypoPRO-ZillaSlab.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" />
+
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://unpkg.com/iblize/dist/iblize.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.js"></script>
+
     <style>
-        .wrapper {
-            display: flex;
-            background: #1b1d23;
-            color: #abb2bf;
-            width: 100%;
-            font-size: 1.1em;
-            line-height: 1.6em;
-            margin: auto;
-        }
-        
-        .wrapper>div {
-            width: 50%;
-            margin: 0.5em;
-        }
-        
-        .header {
-            position: absolute;
-            display: flex;
-            width: 48%;
-            /* justify-content: right; */
-            left: 60%;
-        }
-        
-        .toggle1 {
-            margin-left: 5em;
-            margin-top: 1em;
-            cursor: pointer;
-            color: darkorange;
-        }
-        
-        .beauty {
-            margin-left: 5em;
-            margin-top: 1em;
-            cursor: pointer;
-            color: darkcyan;
-        }
-        
-        .MDcontainer h2 {
-            color: steelblue;
-            line-height: 1em;
-            margin-top: 0.5em;
-            margin-left: 1.5em;
-        }
-        
-        .HTMLcontainer h2 {
-            color: darkred;
-            line-height: 1em;
-            margin-top: 0.5em;
-            margin-left: 1.5em;
-        }
-        
-        .renderedContainer>h2 {
-            color: darkolivegreen;
-            line-height: 1em;
-            margin-top: 0.5em;
-            margin-left: 0.5em;
-        }
-        
-        #HTML,
-        #MD,
-        .rendered {
-            width: 100%;
-            height: 90vh;
-            background: #1b1d23;
-            color: #adbac7;
-            font-size: 14px;
-            line-height: 1.5em;
-            padding: 0.5em;
-            overflow-y: scroll;
-            border: 1px solid #444c56;
-            border-radius: 6px;
-            font-family: "Fira Code";
-        }
-        
-        textarea::-webkit-scrollbar,
-        .wrapper>div::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .wrapper>div,
-        textarea {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        .renderedContainer {
-            display: none;
-        }
-        
-        .rendered {
-            padding: 0 1em 1em 1em;
-            border: 1px solid #444c56;
-            border-radius: 6px;
-            font-family: "Segoe UI", sans-serif;
-        }
-        
-        * {
-            -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: "TypoPRO Zilla Slab", serif;
-            line-height: 1.75em;
-            font-size: 16px;
-            background-color: #1b1d23;
-            color: #adbac7;
-            max-height: 100vh;
-            overflow: hidden;
-        }
-        
-        p {
-            font-size: 16px;
-        }
-        
-        .toggle .switch {
-            margin-left: 5em;
-            margin-top: 1em;
-            cursor: pointer;
-            position: relative;
-            display: inline-block;
-            width: 100px;
-            height: 26px;
-        }
-        
-        .toggle .lable {
-            position: relative;
-            left: -60px;
-            bottom: 2px;
-        }
-        
-        .toggle .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 1px solid #b5bd68;
-            -webkit-transition: 0.4s;
-            transition: 0.4s;
-            border-radius: 26px;
-        }
-        
-        .toggle .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 4px;
-            bottom: 5px;
-            background-color: grey;
-            -webkit-transition: 0.4s;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        
-        .toggle input:checked+.slider {
-            /* background-color: #2ab934; */
-            border: 1px solid #8abeb7;
-        }
-        
-        .toggle input:checked+.slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(75px);
-        }
-        
-        .toggle .slider:after {
-            content: "Code";
-            color: #b5bd68;
-            display: block;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            top: 50%;
-            left: 4em;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        .toggle input:checked+.slider:after {
-            content: "Preview";
-            left: 3em;
-            color: #8abeb7;
-        }
-        
-        .insert .switch {
-            margin-left: 5em;
-            margin-top: 1em;
-            cursor: pointer;
-            position: relative;
-            display: inline-block;
-            width: 100px;
-            height: 26px;
-        }
-        
-        .insert .lable {
-            position: relative;
-            left: -60px;
-            bottom: 2px;
-        }
-        
-        .insert .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 1px solid #b5bd68;
-            -webkit-transition: 0.4s;
-            transition: 0.4s;
-            border-radius: 26px;
-        }
-        
-        .insert .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 4px;
-            bottom: 5px;
-            background-color: grey;
-            -webkit-transition: 0.4s;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        
-        .insert input:checked+.slider {
-            /* background-color: #2ab934; */
-            border: 1px solid #8abeb7;
-        }
-        
-        .insert input:checked+.slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(75px);
-        }
-        
-        .insert .slider:after {
-            content: "plain text";
-            color: #b5bd68;
-            display: block;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            top: 50%;
-            left: 4em;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        .insert input:checked+.slider:after {
-            content: "formatted";
-            left: 3em;
-            color: #8abeb7;
-        }
-        
-        .rendered h1 a,
-        .rendered h1 {
-            font-size: 30px;
-            line-height: 34px;
-            color: #adbac7 !important;
-        }
-        
-        .rendered h2 a,
-        .rendered h2 {
-            font-size: 20px;
-            line-height: 25px;
-            color: #adbac7 !important;
-        }
-        
-        h3 a,
-        h3 {
-            font-size: 16px;
-            line-height: 27px;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #d8d8d8;
-            border-top: 1px solid #d8d8d8;
-            color: #adbac7 !important;
-        }
-        
-        hr {
-            height: 1px;
-            background-color: #d8d8d8;
-            border: none;
-            width: 100%;
-            margin: 0px;
-        }
-        
-        a[href] {
-            color: #1e8ad6;
-            text-decoration: none;
-        }
-        
-        a[href]:hover {
-            color: #3ba0e6;
-        }
-        
-        img {
-            max-width: 100%;
-        }
-        
-        li {
-            line-height: 1.5em;
-        }
-        
-        pre {
-            padding: 16px;
-            overflow: auto;
-            font-size: 85%;
-            line-height: 1.45;
-            background-color: #2b333b;
-            border-radius: 6px;
-            font-family: "Fira Code";
-        }
-        
-        pre code {
-            display: inline;
-            max-width: auto;
-            padding: 0;
-            margin: 0;
-            overflow: visible;
-            line-height: inherit;
-            word-wrap: normal;
-            background-color: transparent;
-            border: 0;
-        }
-        
-        .iblize pre,
-        .iblize-dark {
-            color: #a3b8c2;
-            background-color: #1b1d23;
-        }
-        
-        .iblize .token.punctuation {
-            color: inherit;
-        }
-        
-        .iblize .iblize_linenumber {
-            padding: 10px;
-        }
-        
-        .iblize .iblize_linenumber {
-            border-right: 1px solid #444c56;
-        }
-        
-        .iblize .token.title.important {
-            color: #e05269;
-        }
-        
-        .iblize .token.code {
-            color: #e0a752;
-        }
-        
-        .iblize .token.url {
-            color: #7ab87d;
-        }
+      .wrapper {
+        display: flex;
+        background: #1b1d23;
+        color: #abb2bf;
+        width: 100%;
+        font-size: 1.1em;
+        line-height: 1.6em;
+        margin: auto;
+      }
+
+      .wrapper > div {
+        width: 50%;
+        margin: 0.5em;
+      }
+
+      .header {
+        position: absolute;
+        display: flex;
+        width: 48%;
+        /* justify-content: right; */
+        left: 60%;
+      }
+
+      .toggle1 {
+        margin-left: 5em;
+        margin-top: 1em;
+        cursor: pointer;
+        color: darkorange;
+      }
+
+      .beauty {
+        margin-left: 5em;
+        margin-top: 1em;
+        cursor: pointer;
+        color: darkcyan;
+      }
+
+      .MDcontainer h2 {
+        color: steelblue;
+        line-height: 1em;
+        margin-top: 0.5em;
+        margin-left: 1.5em;
+      }
+
+      .HTMLcontainer h2 {
+        color: darkred;
+        line-height: 1em;
+        margin-top: 0.5em;
+        margin-left: 1.5em;
+      }
+
+      .renderedContainer > h2 {
+        color: darkolivegreen;
+        line-height: 1em;
+        margin-top: 0.5em;
+        margin-left: 0.5em;
+      }
+
+      #HTML,
+      #MD,
+      .rendered {
+        width: 100%;
+        height: 90vh;
+        background: #1b1d23;
+        color: #adbac7;
+        font-size: 14px;
+        line-height: 1.5em;
+        padding: 0.5em;
+        overflow-y: scroll;
+        border: 1px solid #444c56;
+        border-radius: 6px;
+        font-family: "Fira Code";
+      }
+
+      textarea::-webkit-scrollbar,
+      .wrapper > div::-webkit-scrollbar {
+        display: none;
+      }
+
+      .wrapper > div,
+      textarea {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .renderedContainer {
+        display: none;
+      }
+
+      .rendered {
+        padding: 0 1em 1em 1em;
+        border: 1px solid #444c56;
+        border-radius: 6px;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      * {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "TypoPRO Zilla Slab", serif;
+        line-height: 1.75em;
+        font-size: 16px;
+        background-color: #1b1d23;
+        color: #adbac7;
+        max-height: 100vh;
+        overflow: hidden;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .toggle .switch {
+        margin-left: 5em;
+        margin-top: 1em;
+        cursor: pointer;
+        position: relative;
+        display: inline-block;
+        width: 100px;
+        height: 26px;
+      }
+
+      .toggle .lable {
+        position: relative;
+        left: -60px;
+        bottom: 2px;
+      }
+
+      .toggle .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid #b5bd68;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 26px;
+      }
+
+      .toggle .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 4px;
+        bottom: 5px;
+        background-color: grey;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      .toggle input:checked + .slider {
+        /* background-color: #2ab934; */
+        border: 1px solid #8abeb7;
+      }
+
+      .toggle input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(75px);
+      }
+
+      .toggle .slider:after {
+        content: "Code";
+        color: #b5bd68;
+        display: block;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 4em;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .toggle input:checked + .slider:after {
+        content: "Preview";
+        left: 3em;
+        color: #8abeb7;
+      }
+
+      .insert .switch {
+        margin-left: 5em;
+        margin-top: 1em;
+        cursor: pointer;
+        position: relative;
+        display: inline-block;
+        width: 100px;
+        height: 26px;
+      }
+
+      .insert .lable {
+        position: relative;
+        left: -60px;
+        bottom: 2px;
+      }
+
+      .insert .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid #b5bd68;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 26px;
+      }
+
+      .insert .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 4px;
+        bottom: 5px;
+        background-color: grey;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      .insert input:checked + .slider {
+        /* background-color: #2ab934; */
+        border: 1px solid #8abeb7;
+      }
+
+      .insert input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(75px);
+      }
+
+      .insert .slider:after {
+        content: "formatted";
+        color: #b5bd68;
+        display: block;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 4em;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .insert input:checked + .slider:after {
+        content: "plain text";
+        left: 3em;
+        color: #8abeb7;
+      }
+
+      .rendered h1 a,
+      .rendered h1 {
+        font-size: 30px;
+        line-height: 34px;
+        color: #adbac7 !important;
+      }
+
+      .rendered h2 a,
+      .rendered h2 {
+        font-size: 20px;
+        line-height: 25px;
+        color: #adbac7 !important;
+      }
+
+      h3 a,
+      h3 {
+        font-size: 16px;
+        line-height: 27px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #d8d8d8;
+        border-top: 1px solid #d8d8d8;
+        color: #adbac7 !important;
+      }
+
+      hr {
+        height: 1px;
+        background-color: #d8d8d8;
+        border: none;
+        width: 100%;
+        margin: 0px;
+      }
+
+      a[href] {
+        color: #1e8ad6;
+        text-decoration: none;
+      }
+
+      a[href]:hover {
+        color: #3ba0e6;
+      }
+
+      img {
+        max-width: 100%;
+      }
+
+      li {
+        line-height: 1.5em;
+      }
+
+      pre {
+        padding: 16px;
+        overflow: auto;
+        font-size: 85%;
+        line-height: 1.45;
+        background-color: #2b333b;
+        border-radius: 6px;
+        font-family: "Fira Code";
+      }
+
+      pre code {
+        display: inline;
+        max-width: auto;
+        padding: 0;
+        margin: 0;
+        overflow: visible;
+        line-height: inherit;
+        word-wrap: normal;
+        background-color: transparent;
+        border: 0;
+      }
+
+      .iblize pre,
+      .iblize-dark {
+        color: #a3b8c2;
+        background-color: #1b1d23;
+      }
+
+      .iblize .token.punctuation {
+        color: inherit;
+      }
+
+      .iblize .iblize_linenumber {
+        padding: 10px;
+      }
+
+      .iblize .iblize_linenumber {
+        border-right: 1px solid #444c56;
+      }
+
+      .iblize .token.title.important {
+        color: #e05269;
+      }
+
+      .iblize .token.code {
+        color: #e0a752;
+      }
+
+      .iblize .token.url {
+        color: #7ab87d;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="wrapper">
-        <div class="MDcontainer">
-            <h2>Markdown</h2>
-            <div id="MD"></div>
-            <!-- <textarea name="MD" id="MD"></textarea> -->
-        </div>
-        <div class="header">
-            <!-- <span class="toggle">show HTML preview</span> -->
-            <span class="toggle" style="display:none">
-          <label class="switch">
-            <span class="lable">Show </span>
-            <input type="checkbox" id="toggle" style="display: none" />
-            <div class="slider"></div>
-            </label>
-            </span>
-
-            <span class="insert">
+      <div class="MDcontainer">
+        <h2>Markdown</h2>
+        <div id="MD"></div>
+      </div>
+      <div class="header">
+        <span class="insert">
           <label class="switch">
             <span class="lable">Insert </span>
-            <input type="checkbox" id="insert" style="display: none" />
+            <input type="checkbox" id="insert" style="display: none" autocomplete="off"/>
             <div class="slider"></div>
-            </label>
-            </span>
-
-            <!-- <span class="beauty">format HTML</span> -->
-        </div>
-        <div class="renderedContainer" style="display: none">
-            <h2>Preview</h2>
-            <div class="rendered"></div>
-        </div>
-        <div class="HTMLcontainer">
-            <h2>HTML</h2>
-            <div id="HTML"></div>
-            <!-- <textarea name="HTML" id="HTML"></textarea> -->
-        </div>
+          </label>
+        </span>
+        <span class="toggle" style="display: none">
+          <label class="switch">
+            <span class="lable">Show </span>
+            <input type="checkbox" id="toggle" style="display: none" autocomplete="off"/>
+            <div class="slider"></div>
+          </label>
+        </span>
+      </div>
+      <div class="renderedContainer" style="display: none">
+        <h2>Preview</h2>
+        <div class="rendered"></div>
+      </div>
+      <div class="HTMLcontainer">
+        <h2>HTML</h2>
+        <div id="HTML"></div>
+      </div>
     </div>
-</body>
-<script src="https://unpkg.com/iblize/dist/iblize.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.js"></script>
+  </body>
 
-<script>
+  <script>
     let HTMLtextArea = document.getElementById("HTML");
     // let insertCodeType = document.getElementById('insert').value;
     let renderedContainer = document.querySelector("div.renderedContainer");
@@ -425,124 +420,106 @@
     let HTMLcontainer = document.querySelector("div.HTMLcontainer");
     let MDtextArea = document.getElementById("MD");
     const BeautifyOptions = {
-        indent_size: "2",
-        indent_char: " ",
-        max_preserve_newlines: "-1",
-        preserve_newlines: false,
-        keep_array_indentation: false,
-        break_chained_methods: false,
-        indent_scripts: "normal",
-        brace_style: "collapse",
-        space_before_conditional: true,
-        unescape_strings: false,
-        jslint_happy: false,
-        end_with_newline: false,
-        wrap_line_length: "0",
-        indent_inner_html: false,
-        comma_first: false,
-        e4x: false,
-        indent_empty_lines: false,
+      indent_size: "2",
+      indent_char: " ",
+      max_preserve_newlines: "-1",
+      preserve_newlines: false,
+      keep_array_indentation: false,
+      break_chained_methods: false,
+      indent_scripts: "normal",
+      brace_style: "collapse",
+      space_before_conditional: true,
+      unescape_strings: false,
+      jslint_happy: false,
+      end_with_newline: false,
+      wrap_line_length: "0",
+      indent_inner_html: false,
+      comma_first: false,
+      e4x: false,
+      indent_empty_lines: false,
     };
 
     // codeArea (iblize) for HTML
     const iblizeHTML = new Iblize("#HTML", {
-        language: "html",
+      language: "html",
     });
     // codeArea (iblize) for Markdown
     const iblizeMD = new Iblize("#MD", {
-        language: "markdown",
+      language: "markdown",
     });
 
     // markdown to HTML converter
     var converter = new showdown.Converter();
     // HTML to markdown converter
     var turndownService = new TurndownService({
-        headingStyle: "atx",
-        bulletListMarker: "-",
-        codeBlockStyle: "fenced",
-        fence: "```",
-        preformattedCode: false,
+      headingStyle: "atx",
+      bulletListMarker: "-",
+      codeBlockStyle: "fenced",
+      fence: "```",
+      preformattedCode: false,
     });
     turndownService.addRule("pre", {
-        filter: "pre",
-        replacement: function(content, node) {
-            // Note this is not bulletproof, see below.
-            return "```\n" + node.textContent + "\n```";
-        },
+      filter: "pre",
+      replacement: function (content, node) {
+        // Note this is not bulletproof, see below.
+        return "```\n" + node.textContent + "\n```";
+      },
     });
 
-    // beautify HTML code
-    // document
-    //   .querySelector(".beauty")
-    //   .addEventListener("click", function (event) {
-    //     let valueHTML = iblizeHTML.getValue();
-    //     valueHTML = html_beautify(valueHTML, BeautifyOptions);
-    //     iblizeHTML.setValue(valueHTML);
-    //   });
 
     //
     // get formatted text & past in HTML textbox , render MD and past in MD textbox
-    document.addEventListener("paste", function(e) {
-        // let pastedText = e;
+    document.addEventListener("paste", function (e) {
 
-        if (document.getElementById("insert").checked) {
-            e.preventDefault();
-            pastedText = e.clipboardData.getData("text/html");
-            // console.log(document.getElementById("insert").checked);
-        } else {
-            pastedText = e.clipboardData.getData("text/plain");
-        }
-        //   console.log(pastedText);
-        // beautify HTML code
-        pastedText = html_beautify(pastedText, BeautifyOptions);
-        iblizeHTML.setValue(pastedText);
-        // HTMLtextArea.innerHTML = pastedText
-        const valueHTML = iblizeHTML.getValue();
-        var markdown = turndownService.turndown(valueHTML);
-        markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
-            return "&#" + i.charCodeAt(0) + ";";
-        });
-        iblizeMD.setValue(markdown);
+      if (!document.getElementById("insert").checked) {
+        e.preventDefault();
+        pastedText = e.clipboardData.getData("text/html");
+      } else {
+        pastedText = e.clipboardData.getData("text/plain");
+      }
+      // beautify HTML code
+      pastedText = html_beautify(pastedText, BeautifyOptions);
+      iblizeHTML.setValue(pastedText);
+      const valueHTML = iblizeHTML.getValue();
+      var markdown = turndownService.turndown(valueHTML);
+      markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+        return "&#" + i.charCodeAt(0) + ";";
+      });
+      iblizeMD.setValue(markdown);
 
-        document.querySelector('.toggle').style.display = "inline";
-        document.querySelector('.insert').style.display = "none";
-
-        // MDtextArea.value = markdown;
+      document.querySelector(".toggle").style.display = "inline";
     });
 
     //
     // on new input in HTML textarea render MD textarea
-    HTMLtextArea.addEventListener("input", function(event) {
-        const valueHTML = iblizeHTML.getValue();
-        // console.log(valueHTML)
-        var markdown = turndownService.turndown(valueHTML);
-        markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
-            return "&#" + i.charCodeAt(0) + ";";
-        });
-        MDtextArea.value = markdown;
-        iblizeMD.setValue(markdown);
+    HTMLtextArea.addEventListener("input", function (event) {
+      const valueHTML = iblizeHTML.getValue();
+      // console.log(valueHTML)
+      var markdown = turndownService.turndown(valueHTML);
+      markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+        return "&#" + i.charCodeAt(0) + ";";
+      });
+      MDtextArea.value = markdown;
+      iblizeMD.setValue(markdown);
     });
 
     //
     // on new input in MD textarea render previev div
-    MDtextArea.addEventListener("input", function(event) {
-        rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
+    MDtextArea.addEventListener("input", function (event) {
+      rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
     });
 
     //
     // toggle HTML als rendered view
-    document
-        .querySelector(".toggle")
-        .addEventListener("click", function(event) {
-            if (!document.getElementById("toggle").checked) {
-                rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
-                renderedContainer.style.display = "block";
-                HTMLcontainer.style.display = "none";
-            } else {
-                renderedContainer.style.display = "none";
-                HTMLcontainer.style.display = "block";
-            }
-        });
-</script>
-
+    document.querySelector(".toggle").addEventListener("click", function (event) {
+      if (document.getElementById("toggle").checked) {
+        rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
+        renderedContainer.style.display = "block";
+        HTMLcontainer.style.display = "none";
+      } else {
+        renderedContainer.style.display = "none";
+        HTMLcontainer.style.display = "block";
+      }
+    });
+  </script>
 </html>
