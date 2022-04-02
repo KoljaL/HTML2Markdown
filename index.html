@@ -398,7 +398,7 @@
             <span class="toggle" style="display: none">
         <label class="switch">
           <span class="lable">Show </span>
-            <input type="checkbox" id="toggle" style="display: none" autocomplete="off" />
+            <input type="checkbox" id="toggle" style="display: none" autocomplete="off" checked/>
             <div class="slider"></div>
             </label>
             </span>
@@ -506,6 +506,10 @@
         iblizeMD.setValue(markdown);
 
         document.querySelector(".toggle").style.display = "inline";
+        rendered.innerHTML = converter.makeHtml(iblizeMD.getValue());
+
+        renderedContainer.style.display = "block";
+        HTMLcontainer.style.display = "none";
     });
 
     //
@@ -514,9 +518,9 @@
         const valueHTML = iblizeHTML.getValue();
         // console.log(valueHTML)
         var markdown = turndownService.turndown(valueHTML);
-        markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
-            return "&#" + i.charCodeAt(0) + ";";
-        });
+        // markdown = markdown.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+        //     return "&#" + i.charCodeAt(0) + ";";
+        // });
         MDtextArea.value = markdown;
         iblizeMD.setValue(markdown);
     });
